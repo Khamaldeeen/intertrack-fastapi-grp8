@@ -47,11 +47,10 @@ def prediction(data: DataType):
     answer = np.exp(answer)
 
     if answer:
-            return {"Expected sales": answer}
+            return data
     else:
         return {"status": 404,
                 "body": {"Message": "Are you sure you're using the right data ?"}}
-    return data
     
 '''
     if answer < 1000:
