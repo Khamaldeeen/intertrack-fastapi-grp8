@@ -47,8 +47,8 @@ def prediction(data: DataType):
     answer = np.exp(answer)
 
     if answer:
-            return {"statusCode": 200,
-                "body": {"Expected sales": answer}}
+            return {data,
+                    "body": {"Expected sales": answer}}
     else:
         return {"status": 404,
                 "body": {"Message": "Are you sure you're using the right data ?"}}
