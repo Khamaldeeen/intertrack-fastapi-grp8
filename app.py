@@ -47,7 +47,7 @@ def prediction(data: DataType):
     answer = np.exp(answer)
 
     if answer:
-            return data
+            return data, answer
     else:
         return {"status": 404,
                 "body": {"Message": "Are you sure you're using the right data ?"}}
