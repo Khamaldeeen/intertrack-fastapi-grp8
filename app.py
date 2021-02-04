@@ -5,6 +5,9 @@ import joblib
 from pydantic import BaseModel 
 
 
+class OutData(BaseModel):
+    pred : float
+
 class DataType(BaseModel):
     product : str
     calories : float 
@@ -29,7 +32,7 @@ def index():
     return {"API" : "Ready to call"}
 
 
-@app.post('/predict')
+@app.post('/predict', response_model=OutData)
 def prediction(data: DataType):
     data = data.dict()
     prd = data['product']
@@ -45,14 +48,16 @@ def prediction(data: DataType):
     cuisine = data['cuisine']
     answer = model.predict([prd, cal, carb, time, dsh, heat, fat, ingrd, prot, pro_clss, cuisine])
     answer = np.exp(answer)
-
+    answer = OutData(pred = answer)
+    return answer
+'''
     if answer:
             return data, answer
     else:
         return {"status": 404,
                 "body": {"Message": "Are you sure you're using the right data ?"}}
     
-'''
+
     if answer < 1000:
         return {f"Sales is low with value{answer}. Ensure to increase your input"}
 
