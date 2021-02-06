@@ -1,9 +1,23 @@
+from pydantic.types import Json
 import uvicorn 
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from typing import List
 import numpy as np 
 import joblib 
 from pydantic import BaseModel 
 
+
+
+#load model
+
+app = FastAPI()
+
+model = joblib.load("myModel.sav")
+
+@app.get('/')
+def index():
+    return {"API" : "Ready to call"}
 
 class OutData(BaseModel):
     pred : float
@@ -21,38 +35,31 @@ class DataType(BaseModel):
     protein_class : str 
     cuisine : str 
 
-#load model
-
-app = FastAPI()
-
-model = joblib.load("myModel.sav")
-
-@app.get('/')
-def index():
-    return {"API" : "Ready to call"}
-
-
 @app.post('/predict', response_model=OutData)
-def prediction(data: DataType):
-    data = data.dict()
-    prd = data['product']
-    cal = data['calories']
-    carb = data['carbs']
-    time = data['time']
-    dsh = data['dish']
-    heat = data['heat']
-    fat = data['fat']
-    ingrd = data['no_ingredients']
-    prot = data['proteins']
-    pro_clss = data['protein_class']
-    cuisine = data['cuisine']
+def prediction(data : DataType):
+    data = data.dict()  
+    prd = data.get("product")
+    cal = data.get("calories")
+    carb = data.get("carbs")
+    time = data.get("time")
+    dsh = data.get("dish")
+    heat = data.get("heat")
+    fat = data.get("fat")
+    ingrd = data.get("no_ingredients")
+    prot = data.get("proteins")
+    pro_clss = data.get("protein_class")
+    cuisine = data.get("cuisine")
     answer = model.predict([prd, cal, carb, time, dsh, heat, fat, ingrd, prot, pro_clss, cuisine])
     answer = np.exp(answer)
     answer = OutData(pred = answer)
+    answer = jsonable_encoder(answer)
+    
     return answer
-'''
+    
+    '''
     if answer:
-            return data, answer
+            return {"statusCode": 200,
+                "body": {"Expected sales": answer}}
     else:
         return {"status": 404,
                 "body": {"Message": "Are you sure you're using the right data ?"}}
